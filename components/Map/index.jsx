@@ -34,15 +34,15 @@ const Map = () => {
     }
 
     useEffect(() => {
-        const map = L.map(mapContainerRef.current).setView([-3.7300563, -38.75], 10); // Chicago origins
+        const map = L.map(mapContainerRef.current).setView([51.509, -0.08], 10); // Chicago origins
         const mapTiles = '//stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png';
         const osmCPLink = '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>';
         const mapCPLink = '<a href="http://maps.stamen.com/toner">Stamen Design</a>';
         L.tileLayer(mapTiles, {
             attribution: `${osmCPLink} | ${mapCPLink}`,
             detectRetina: false,
-            maxZoom: 18,
-            minZoom: 10,
+            maxZoom: 25,
+            minZoom: 1,
             noWrap: false,
             subdomains: 'abc'
         }).addTo(map);
