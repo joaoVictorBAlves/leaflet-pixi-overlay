@@ -56,7 +56,7 @@ const Map = () => {
 
             // var markersLatLng = marker_stress.map((marker) => [marker.latitude, marker.longitude]);
             var markersLatLng = []
-            var markerCount = 1000000;
+            var markerCount = 100000;
             var markers = [];
 
             for (let index = 0; index < markerCount; index++) {
