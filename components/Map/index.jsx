@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import "leaflet-pixi-overlay";
-import * as PIXI from 'pixi.js';
+import L from "leaflet"
+import "leaflet-pixi-overlay/L.PixiOverlay";
+import "pixi.js";
 import "leaflet/dist/leaflet.css";
 import Style from "../../styles/Map.module.css"
 import data from "../../data/mapa-social-caucaia.json"
+import marker_stress from "../../data/stress_markers.json";
 
 const Map = () => {
     const [escalaSocial, setEscalaSocial] = useState(data.escalas.maiorV005 / 5.0);
@@ -32,69 +34,81 @@ const Map = () => {
             layer.bindPopup(nome + "| " + valor.toFixed(2) + " | Renda alta")
         }
     }
+    
+    function getRandom(min, max) {
+        return min + Math.random() * (max - min);
+    }
 
     useEffect(() => {
-        const map = L.map(mapContainerRef.current).setView([51.509, -0.08], 10); // Chicago origins
-        const mapTiles = '//stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png';
-        const osmCPLink = '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>';
-        const mapCPLink = '<a href="http://maps.stamen.com/toner">Stamen Design</a>';
-        L.tileLayer(mapTiles, {
-            attribution: `${osmCPLink} | ${mapCPLink}`,
-            detectRetina: false,
-            maxZoom: 25,
-            minZoom: 1,
-            noWrap: false,
-            subdomains: 'abc'
-        }).addTo(map);
+        if (mapContainerRef.current) {
+            const map = L.map(mapContainerRef.current).setView([48.840383, 2.341108], 13); // Chicago origins
+            const mapTiles = '//stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png';
+            const osmCPLink = '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+            const mapCPLink = '<a href="http://maps.stamen.com/toner">Stamen Design</a>';
+            L.tileLayer(mapTiles, {
+                attribution: `${osmCPLink} | ${mapCPLink}`,
+                detectRetina: false,
+                minZoom: 4,
+                maxZoom: 18,
+                noWrap: false,
+                subdomains: 'abc'
+            }).addTo(map);
+            
+            var markersLatLng = marker_stress.map((marker) => [marker.latitude, marker.longitude]);
+            var markerCount = markersLatLng.length;
+            var markers = [];
 
-        const mapa_social = L.geoJSON(data, {
-            onEachFeature: onEachFeature
-        });
-        mapa_social.addTo(map);
+            var loader = new PIXI.loaders.Loader();
+            loader.add('marker', './assets/red.png');
+            loader.load(function (loader, resources) {
+                var pixiContainer = new PIXI.Container();
+                var markerTexture = resources.marker.texture;
+                for (var i = 0; i < markerCount; i++) {
+                    markers[i] = new PIXI.Sprite(markerTexture);
+                    markers[i].anchor.set(0.5, 1);
+                    pixiContainer.addChild(markers[i]);
+                }
 
-        var polygonLatLngs = [
-            [51.509, -0.08],
-            [51.503, -0.06],
-            [51.51, -0.047],
-            [51.509, -0.08]
-        ];
-        var projectedPolygon;
-        var triangle = new PIXI.Graphics();
+                var firstDraw = true;
+                var prevZoom;
 
-        var pixiContainer = new PIXI.Container();
-        pixiContainer.addChild(triangle);
+                var pixiOverlay = L.pixiOverlay(function (utils) {
+                    var zoom = utils.getMap().getZoom();
+                    var container = utils.getContainer();
+                    var renderer = utils.getRenderer();
+                    var project = utils.latLngToLayerPoint;
+                    var scale = utils.getScale();
 
-        var firstDraw = true;
-        var prevZoom;
+                    for (var i = 0; i < markerCount; i++) {
+                        if (firstDraw) {
+                            var markerCoords = project(markersLatLng[i]);
+                            markers[i].x = markerCoords.x;
+                            markers[i].y = markerCoords.y;
+                        }
+                    }
 
-        var pixiOverlay = L.pixiOverlay(function (utils) {
-            var zoom = utils.getMap().getZoom();
-            var container = utils.getContainer();
-            var renderer = utils.getRenderer();
-            var project = utils.latLngToLayerPoint;
-            var scale = utils.getScale();
+                    if (firstDraw || prevZoom !== zoom) {
+                        for (var i = 0; i < markerCount; i++) {
+                            markers[i].scale.set(0.03 / scale);
+                        }
+                    }
 
-            if (firstDraw) {
-                projectedPolygon = polygonLatLngs.map(function (coords) { return project(coords); });
+                    firstDraw = false;
+                    prevZoom = zoom;
+                    renderer.render(container);
+                }, pixiContainer);
+                pixiOverlay.addTo(map);
+            });
+
+            const mapa_social = L.geoJSON(data, {
+                onEachFeature: onEachFeature
+            });
+            mapa_social.addTo(map);
+
+
+            return () => {
+                map.remove();
             }
-            if (firstDraw || prevZoom !== zoom) {
-                triangle.clear();
-                triangle.lineStyle(3 / scale, 0x3388ff, 1);
-                triangle.beginFill(0x3388ff, 0.2);
-                projectedPolygon.forEach(function (coords, index) {
-                    if (index == 0) triangle.moveTo(coords.x, coords.y);
-                    else triangle.lineTo(coords.x, coords.y);
-                });
-                triangle.endFill();
-            }
-            firstDraw = false;
-            prevZoom = zoom;
-            renderer.render(container);
-        }, pixiContainer);
-        pixiOverlay.addTo(map);
-
-        return () => {
-            map.remove();
         }
     }, [mapContainerRef]);
 
