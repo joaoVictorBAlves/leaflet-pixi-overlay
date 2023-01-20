@@ -34,14 +34,14 @@ const Map = () => {
             layer.bindPopup(nome + "| " + valor.toFixed(2) + " | Renda alta")
         }
     }
-    
+
     function getRandom(min, max) {
         return min + Math.random() * (max - min);
     }
 
     useEffect(() => {
         if (mapContainerRef.current) {
-            const map = L.map(mapContainerRef.current).setView([48.840383, 2.341108], 13); // Chicago origins
+            const map = L.map(mapContainerRef.current).setView([48.838565, 2.449264526367], 13); // Chicago origins
             const mapTiles = '//stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png';
             const osmCPLink = '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>';
             const mapCPLink = '<a href="http://maps.stamen.com/toner">Stamen Design</a>';
@@ -53,10 +53,18 @@ const Map = () => {
                 noWrap: false,
                 subdomains: 'abc'
             }).addTo(map);
-            
-            var markersLatLng = marker_stress.map((marker) => [marker.latitude, marker.longitude]);
-            var markerCount = markersLatLng.length;
+
+            // var markersLatLng = marker_stress.map((marker) => [marker.latitude, marker.longitude]);
+            var markersLatLng = []
+            var markerCount = 1000000;
             var markers = [];
+
+            for (let index = 0; index < markerCount; index++) {
+                markersLatLng.push([getRandom(48.7, 49), getRandom(2.2, 2.8)]);
+            }
+
+            console.log(markersLatLng)
+
 
             var loader = new PIXI.loaders.Loader();
             loader.add('marker', './assets/red.png');
