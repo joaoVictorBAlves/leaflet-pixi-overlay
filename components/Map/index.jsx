@@ -1,39 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import L from "leaflet"
+import L, { point, polygon } from "leaflet"
 import "leaflet-pixi-overlay/L.PixiOverlay";
 import "pixi.js";
 import "leaflet/dist/leaflet.css";
 import Style from "../../styles/Map.module.css"
 import data from "../../data/mapa-social-caucaia.json"
+import teste from "../../data/teste-france.json"
 import marker_stress from "../../data/stress_markers.json";
+import { makeStyles } from "@mui/material";
 
 const Map = () => {
     const [escalaSocial, setEscalaSocial] = useState(data.escalas.maiorV005 / 5.0);
     const mapContainerRef = useRef(null);
-
-    const onEachFeature = (place, layer) => {
-        layer.options.fillOpacity = 1
-        layer.options.color = "#000"
-        layer.options.weight = 0.5
-        const valor = place.properties.V005
-        const nome = place.properties.NM_BAIRRO
-        if (valor < escalaSocial) {
-            layer.options.fillColor = "#C1EAF3"
-            layer.bindPopup(nome + "| " + valor.toFixed(2) + " | Renda baixa")
-        } else if (valor > escalaSocial && valor < (escalaSocial * 2)) {
-            layer.options.fillColor = "#79E0DF"
-            layer.bindPopup(nome + "| " + valor.toFixed(2) + " | Renda média baixa")
-        } else if (valor > (escalaSocial * 2) && valor < (escalaSocial * 3)) {
-            layer.options.fillColor = "#54C7C1"
-            layer.bindPopup(nome + "| " + valor.toFixed(2) + " | Renda média alto")
-        } else if (valor > (escalaSocial * 3) && valor < (escalaSocial * 4)) {
-            layer.options.fillColor = "#54C7C1"
-            layer.bindPopup(nome + "| " + valor.toFixed(2) + " | Renda média alto")
-        } else {
-            layer.options.fillColor = "#02A199"
-            layer.bindPopup(nome + "| " + valor.toFixed(2) + " | Renda alta")
-        }
-    }
 
     function getRandom(min, max) {
         return min + Math.random() * (max - min);
@@ -41,6 +19,7 @@ const Map = () => {
 
     useEffect(() => {
         if (mapContainerRef.current) {
+            // Criando mapa e tiles
             const map = L.map(mapContainerRef.current).setView([48.838565, 2.449264526367], 13); // Chicago origins
             const mapTiles = '//stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png';
             const osmCPLink = '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>';
@@ -54,18 +33,16 @@ const Map = () => {
                 subdomains: 'abc'
             }).addTo(map);
 
-            // var markersLatLng = marker_stress.map((marker) => [marker.latitude, marker.longitude]);
+            // MARCADORES
+            var markersLatLng = marker_stress.map((marker) => [marker.latitude, marker.longitude]);
             var markersLatLng = []
             var markerCount = 100000;
             var markers = [];
-
+            // Gera as coordenadas randomicas
             for (let index = 0; index < markerCount; index++) {
                 markersLatLng.push([getRandom(48.7, 49), getRandom(2.2, 2.8)]);
             }
-
-            console.log(markersLatLng)
-
-
+            // Carregando marcadores
             var loader = new PIXI.loaders.Loader();
             loader.add('marker', './assets/red.png');
             loader.load(function (loader, resources) {
@@ -108,10 +85,77 @@ const Map = () => {
                 pixiOverlay.addTo(map);
             });
 
-            const mapa_social = L.geoJSON(data, {
-                onEachFeature: onEachFeature
-            });
-            mapa_social.addTo(map);
+            // POLIGONOS
+            function getPolygonCoords(geojson) {
+                var polygonLatLngs = [];
+                geojson.features.forEach(function (feature) {
+                    if (feature.geometry.type === "Polygon") {
+                        polygonLatLngs.push(feature.geometry.coordinates[0]);
+                    }
+                });
+                return polygonLatLngs;
+            }
+            // Array com polígonos e coordenadas
+            var polygonLatLngs = getPolygonCoords(data)
+            // Ajuste de posição de mão
+            polygonLatLngs = polygonLatLngs.map(polygon => polygon.map(coords => {
+                const newCoords = [coords[1], coords[0]];
+                return newCoords;
+            }));
+
+            // Initial settings
+            var pixiContainer = new PIXI.Container();
+            var firstDraw = true;
+            var prevZoom;
+
+            // Creating shapes
+            var pixiShapeOverlay = L.pixiOverlay(function (utils) {
+                // Utilities
+                var zoom = utils.getMap().getZoom();
+                var container = utils.getContainer();
+                var renderer = utils.getRenderer();
+                var project = utils.latLngToLayerPoint;
+                var scale = utils.getScale();
+                var polygons = polygonLatLngs;
+                var color = 0xff00000;
+
+                const drawPolygon = (polygon) => {
+                    // Create the polygon
+                    var pixiPolygon = new PIXI.Graphics();
+                    container.addChild(pixiPolygon);
+                    var projectedPolygons = polygon.map((coords) => project(coords));
+                    pixiPolygon.clear();
+                    pixiPolygon.lineStyle(1.2 / scale, color, 1);
+                    pixiPolygon.beginFill(color, 0.2);
+                    projectedPolygons.forEach(function (coords, index) {
+                        if (index == 0)
+                            pixiPolygon.moveTo(coords.x, coords.y);
+                        else
+                            pixiPolygon.lineTo(coords.x, coords.y);
+                    });
+                    pixiPolygon.endFill();
+
+                    // Add click event for the polygon
+                    pixiPolygon.interactive = true;
+                    pixiPolygon.buttonMode = true;
+                    pixiPolygon.on("pointerdown", function () {
+                        console.log("Hello!");
+                    });
+                }
+
+                if (firstDraw || prevZoom !== zoom) {
+                    // Clear the container and draw the polygons on each iteration
+                    container.removeChildren();
+                    polygons.forEach((polygon, index) => {
+                        drawPolygon(polygon);
+                    });
+                }
+                firstDraw = false;
+                prevZoom = zoom;
+                renderer.render(container);
+            }, pixiContainer);
+            pixiShapeOverlay.addTo(map);
+
 
 
             return () => {
