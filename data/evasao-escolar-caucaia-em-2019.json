@@ -1,0 +1,178 @@
+[
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "EEFM DOM ALOISIO LORSCHEIDER",
+        "classificacao": 2,
+        "inep_id": 23190337,
+        "slug": "eefm-dom-aloisio-lorscheider",
+        "index": "15.1944903581",
+        "matriculas": "726",
+        "lat": -3.7664215,
+        "lon": -38.6595288
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "EEFM ELIEZER DE FREITAS GUIMARAES",
+        "classificacao": 3,
+        "inep_id": 23062347,
+        "slug": "eefm-eliezer-de-freitas-guimaraes",
+        "index": "0.3845794393",
+        "matriculas": "856",
+        "lat": -3.7660215,
+        "lon": -38.6548622
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "EEFM PRESIDENTE JOSE SARNEY",
+        "classificacao": 3,
+        "inep_id": 23062738,
+        "slug": "eefm-presidente-jose-sarney",
+        "index": "6.5104145602",
+        "matriculas": "989",
+        "lat": -3.7662847,
+        "lon": -38.6362812
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "EEM ALICE MOREIRA DE OLIVEIRA",
+        "classificacao": 3,
+        "inep_id": 23462345,
+        "slug": "eem-alice-moreira-de-oliveira",
+        "index": "4.0384615385",
+        "matriculas": "351",
+        "lat": -3.7481216,
+        "lon": -38.9529259
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "EEM BRANCA CARNEIRO DE MENDONCA",
+        "classificacao": 3,
+        "inep_id": 23062126,
+        "slug": "eem-branca-carneiro-de-mendonca",
+        "index": "10.4705846529",
+        "matriculas": "1642",
+        "lat": -3.734676,
+        "lon": -38.6557989
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "EEM EDSON CORREA",
+        "classificacao": 3,
+        "inep_id": 23062312,
+        "slug": "eem-edson-correa",
+        "index": "0.9096064815",
+        "matriculas": "864",
+        "lat": -3.7165661,
+        "lon": -38.657305
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "EEM JOSE ALEXANDRE",
+        "classificacao": 3,
+        "inep_id": 23062703,
+        "slug": "eem-jose-alexandre",
+        "index": "6.3937588652",
+        "matriculas": "705",
+        "lat": -3.7362066,
+        "lon": -38.6954749
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "EEM PROFESSORA IRACI PEREIRA DE ALCANTARA",
+        "classificacao": 3,
+        "inep_id": 23264675,
+        "slug": "eem-professora-iraci-pereira-de-alcantara",
+        "index": "5.6331746032",
+        "matriculas": "630",
+        "lat": -3.6712201,
+        "lon": -38.6710892
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "EEMTI ESTRELA TORQUATO",
+        "classificacao": 2,
+        "inep_id": 23180226,
+        "slug": "eemti-estrela-torquato",
+        "index": "7.4171974522",
+        "matriculas": "314",
+        "lat": -3.740701,
+        "lon": -38.6687485
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "EEMTI JOSE MARIA PONTES DA ROCHA",
+        "classificacao": 3,
+        "inep_id": 23062720,
+        "slug": "eemti-jose-maria-pontes-da-rocha",
+        "index": "7.3641723356",
+        "matriculas": "441",
+        "lat": -3.740748,
+        "lon": -38.61291
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "EEMTI ROMEU DE CASTRO MENEZES",
+        "classificacao": 3,
+        "inep_id": 23063505,
+        "slug": "eemti-romeu-de-castro-menezes",
+        "index": "1.7986702128",
+        "matriculas": "376",
+        "lat": -3.7686033,
+        "lon": -38.6548996
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "EEMTI ROTARY CLUB SAO MIGUEL",
+        "classificacao": 2,
+        "inep_id": 23063076,
+        "slug": "eemti-rotary-club-sao-miguel",
+        "index": "3.4333333333",
+        "matriculas": "360",
+        "lat": -3.7486004,
+        "lon": -38.6037386
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "EEMTI VICENTE ARRUDA",
+        "classificacao": 3,
+        "inep_id": 23063599,
+        "slug": "eemti-vicente-arruda",
+        "index": "0.0000000000",
+        "matriculas": "511",
+        "lat": -3.744466,
+        "lon": -38.66462
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "ESCOLA INDIGENA INDIOS TAPEBA",
+        "classificacao": 3,
+        "inep_id": 23215674,
+        "slug": "escola-indigena-indios-tapeba",
+        "index": "15.0740740741",
+        "matriculas": "81",
+        "lat": -3.7459785,
+        "lon": -38.7056009
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "ESCOLA INDIGENA TAPEBA DO TRILHO",
+        "classificacao": 2,
+        "inep_id": 23215682,
+        "slug": "escola-indigena-tapeba-do-trilho",
+        "index": "0.0000000000",
+        "matriculas": "46",
+        "lat": -3.7293142,
+        "lon": -38.6816004
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "LICEU DE CAUCAIA",
+        "classificacao": 3,
+        "inep_id": 23236353,
+        "slug": "liceu-de-caucaia",
+        "index": "0.1428369795",
+        "matriculas": "1417",
+        "lat": -3.7626285,
+        "lon": -38.6250766
+    }
+]
