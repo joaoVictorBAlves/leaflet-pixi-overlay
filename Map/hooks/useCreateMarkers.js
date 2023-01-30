@@ -1,6 +1,6 @@
 import "pixi.js";
 
-const useCreateMarkers = (data, map, escala = undefined) => {
+const useCreateMarkers = (data, map, escala, escalaVar) => {
     var markersLatLng = data.map((marker) => [marker.lat, marker.lon])
     var markerCount = markersLatLng.length
     var markers = [];
@@ -10,10 +10,10 @@ const useCreateMarkers = (data, map, escala = undefined) => {
     var loader = new PIXI.loaders.Loader();
     loader.add('default', './assets/default.png');
     // Marcadores para escala
-    loader.add('red', './assets/red.png');
-    loader.add('orange', './assets/orange.png');
-    loader.add('yellow', './assets/yellow.png');
-    loader.add('green', './assets/green.png');
+    loader.add('red', '../assets/red.png');
+    loader.add('orange', '../assets/orange.png');
+    loader.add('yellow', '../assets/yellow.png');
+    loader.add('green', '../assets/green.png');
     loader.load(function (loader, resources) {
         var pixiContainer = new PIXI.Container();
         var markerTexture = {
@@ -25,9 +25,9 @@ const useCreateMarkers = (data, map, escala = undefined) => {
         }
 
         data.forEach((marker, index) => {
-            var valor = marker.index
+            var valor = marker[escalaVar]
             var color;
-            if (escala !== undefined) {
+            if (escalaVar !== undefined) {
                 if (valor < escala) {
                     color = "green"
                 } else if (valor > escala && valor < escala * 2) {
