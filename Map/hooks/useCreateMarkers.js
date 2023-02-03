@@ -16,6 +16,7 @@ const useCreateMarkers = (data, map, escala, escalaVar) => {
     loader.add('green', '../assets/green.png');
     loader.load(function (loader, resources) {
         var pixiContainer = new PIXI.Container();
+        pixiContainer.removeChildren()
         var markerTexture = {
             default: resources.default.texture,
             red: resources.red.texture,
@@ -23,7 +24,7 @@ const useCreateMarkers = (data, map, escala, escalaVar) => {
             yellow: resources.yellow.texture,
             green: resources.green.texture
         }
-
+        PIXI.utils.clearTextureCache();
         data.forEach((marker, index) => {
             var valor = marker[escalaVar]
             var color;

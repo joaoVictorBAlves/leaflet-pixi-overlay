@@ -90,6 +90,8 @@ const useCreatePolygon = (data, map, escala = undefined, escalaVar = undefined) 
                 if (feature.geometry.type === 'Polygon') {
                     drawPoly(color, alpha)(feature.geometry.coordinates, feature.properties);
                 } else if (feature.geometry.type == 'MultiPolygon') {
+                    console.log("Aqui era pra ser desenhado um multipoligono")
+                    // feature.geometry.coordinates.forEach((poly => poly.forEach((drawPoly(color, alpha)))));
                     feature.geometry.coordinates.forEach(drawPoly(color, alpha));
                 }
             });

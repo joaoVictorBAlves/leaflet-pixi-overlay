@@ -1,0 +1,24 @@
+[
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "EEFM DOM ALOISIO LORSCHEIDER",
+        "classificacao": 2,
+        "inep_id": 23190337,
+        "slug": "eefm-dom-aloisio-lorscheider",
+        "index": "15.1944903581",
+        "matriculas": "726",
+        "lat": -3.7664215,
+        "lon": -38.6595288
+    },
+    {
+        "date": "2019-01-01 00:00:00",
+        "nome": "EEFM ELIEZER DE FREITAS GUIMARAES",
+        "classificacao": 3,
+        "inep_id": 23062347,
+        "slug": "eefm-eliezer-de-freitas-guimaraes",
+        "index": "0.3845794393",
+        "matriculas": "856",
+        "lat": -3.7660215,
+        "lon": -38.6548622
+    }
+]
