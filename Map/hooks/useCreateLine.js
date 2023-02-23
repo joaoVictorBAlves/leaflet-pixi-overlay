@@ -2,7 +2,6 @@ import "leaflet-pixi-overlay/L.PixiOverlay";
 import "pixi.js";
 
 const useCreateLine = (data, map) => {
-    console.log(data.features[0].geometry.coordinates)
     // POLIGONOS
     function getPolygonCoords(geojson) {
         var roteCoordinates = geojson.features[0].geometry.coordinates
@@ -10,13 +9,11 @@ const useCreateLine = (data, map) => {
     }
     // Array com polígonos e coordenadas
     var roteCoordinates = getPolygonCoords(data)
-    console.log(roteCoordinates)
     // Ajuste de posição de mão
     roteCoordinates = roteCoordinates.map((coords) => {
         const newCoords = [coords[1], coords[0]];
         return newCoords;
     });
-    console.log(roteCoordinates)
 
     // Initial settings
     var pixiContainer = new PIXI.Container();

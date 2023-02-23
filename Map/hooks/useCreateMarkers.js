@@ -1,10 +1,13 @@
 import "pixi.js";
 
-const useCreateMarkers = (data, map, escala, escalaVar) => {
+const useCreateMarkers = (data, map, escala, escalaVar, pixiContainer) => {
     var markersLatLng = data.map((marker) => [marker.lat, marker.lon])
     var markerCount = markersLatLng.length
     var markers = [];
     var pixiOverlay;
+
+    pixiContainer.interactive = true;
+    pixiContainer.buttonMode = true;
 
     // Carregando marcadores
     var loader = new PIXI.loaders.Loader();
@@ -15,8 +18,6 @@ const useCreateMarkers = (data, map, escala, escalaVar) => {
     loader.add('yellow', '../assets/yellow.png');
     loader.add('green', '../assets/green.png');
     loader.load(function (loader, resources) {
-        var pixiContainer = new PIXI.Container();
-        pixiContainer.removeChildren()
         var markerTexture = {
             default: resources.default.texture,
             red: resources.red.texture,
@@ -24,7 +25,7 @@ const useCreateMarkers = (data, map, escala, escalaVar) => {
             yellow: resources.yellow.texture,
             green: resources.green.texture
         }
-        PIXI.utils.clearTextureCache();
+
         data.forEach((marker, index) => {
             var valor = marker[escalaVar]
             var color;
@@ -56,8 +57,8 @@ const useCreateMarkers = (data, map, escala, escalaVar) => {
             var project = utils.latLngToLayerPoint;
             var scale = utils.getScale();
 
-            for (var i = 0; i < markerCount; i++) {
-                if (firstDraw) {
+            if (firstDraw) {
+                for (var i = 0; i < markerCount; i++) {
                     var markerCoords = project(markersLatLng[i]);
                     markers[i].x = markerCoords.x;
                     markers[i].y = markerCoords.y;
@@ -65,6 +66,8 @@ const useCreateMarkers = (data, map, escala, escalaVar) => {
             }
 
             if (firstDraw || prevZoom !== zoom) {
+                console.log("Zoom mudou")
+                PIXI.utils.clearTextureCache();
                 for (var i = 0; i < markerCount; i++) {
                     markers[i].scale.set(0.07 / scale);
                 }

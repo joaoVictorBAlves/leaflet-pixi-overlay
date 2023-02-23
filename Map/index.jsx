@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import L from "leaflet"
+import L, { GeoJSON } from "leaflet"
 import "leaflet-pixi-overlay/L.PixiOverlay";
 import "leaflet/dist/leaflet.css";
+import "pixi.js";
 import Style from "./Map.module.css"
 import useCreatePolygon from "./hooks/useCreatePolygon";
 import useCreateMarkers from "./hooks/useCreateMarkers";
@@ -58,7 +59,6 @@ const Map = ({ data, choroplethVariable, coordenates = [0, 0], zoom = 10, minzoo
         setDataMakers(dataMakers);
         setMakeVariable(makerVariable);
         setMakersScale((findMaxValueMarker(dataMakersState, makerVariable) - findMinValueMarker(dataMakersState, makerVariable)) / 3.0)
-        console.log(makerVariable, makerVariableState)
     }, [dataMakers, makerVariable])
 
     useEffect(() => {
@@ -77,31 +77,34 @@ const Map = ({ data, choroplethVariable, coordenates = [0, 0], zoom = 10, minzoo
                 subdomains: 'abc'
             }).addTo(mapState);
 
-            // Gera polígono com ou sem choropleth
-            let variable;
-            if (dataState.features[0].properties[choroplethVariableState] !== undefined) {
-                variable = choroplethVariableState;
-            }
-            useCreatePolygon(dataState, mapState, choroplethScale, variable);
+            var conteiner = new PIXI.Container();
 
             // Gera marcador com ou sem diferenciação
             let makerVariable;
-            if (dataMakersState[0][makerVariableState] !== undefined) {
-                makerVariable = makerVariableState;
+            if (dataMakersState) {
+                if (dataMakersState[0][makerVariableState] !== undefined) {
+                    makerVariable = makerVariableState;
+                }
+                useCreateMarkers(dataMakersState, mapState, makersScale, makerVariable, new PIXI.Container())
             }
-            console.log(makerVariable, makersScale)
-            useCreateMarkers(dataMakersState, mapState, makersScale, makerVariable)
 
+            // Gera polígono com ou sem choropleth
+            let variable;
+            if (dataState) {
+                if (dataState.features[0].properties[choroplethVariableState] !== undefined) {
+                    variable = choroplethVariableState;
+                }
+                useCreatePolygon(dataState, mapState, choroplethScale, variable, new PIXI.Container());
+            }
             // Gera alguma rota
             if (routeState !== undefined) {
                 useCreateLine(routeState, mapState);
             }
         }
-
         return () => {
             mapState.remove();
         }
-    }, [mapContainerRef, choroplethVariableState, makerVariableState, routeState]);
+    }, [mapContainerRef, choroplethVariableState, makerVariableState, routeState, zoomState]);
 
 
     return (

@@ -1,5 +1,5 @@
 // Styles and Material UI
-import { Button, FormControl, FormControlLabel, FormHelperText, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import Box from '@mui/material/Box';
@@ -11,11 +11,6 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -23,47 +18,35 @@ import '@fontsource/roboto/700.css';
 // Data and Import utilities
 import dynamic from "next/dynamic";
 import data from "../data/mapa-social-caucaia.json"
-import data_markers from "../data/evasao-escolar-caucaia-em-2019.json";
+import data_markers from "../data/teste-marcadores.json";
 import points from "../data/teste-rota.json"
 import { useEffect, useState } from "react";
-import { index } from "d3";
-import { UploadFile } from "@mui/icons-material";
-const Map = dynamic(() => import("../Map"), {
+const Map = dynamic(() => import("../MapComponent"), {
   ssr: false
 });
 
 const Home = () => {
-  // States
-  // const [file, setFile] = useState(null);
-  // const [fileName, setFileName] = useState('');
+  // STATES
   const [choroplethVar, setChoropletVar] = useState();
   const [route, setRoute] = useState();
   const [makersVar, setMakersVar] = useState();
   const [lon, setLon] = useState(data.features[0].geometry.coordinates[0][0][0]);
   const [lat, setLat] = useState(data.features[0].geometry.coordinates[0][0][1]);
   const drawerWidth = 240;
-  let fetch_data;
-
-  // Distribution of props in Arrays
+  var fetch_data = null;
+  // LISTAS DE PROPRIEDADES DOS GRÁFICOS
   const propsPolygon = [];
   const propsMarkers = [];
-
   Object.keys(data.features[0].properties).forEach((item) => {
     if (!isNaN(data.features[0].properties[item])) {
       propsPolygon.push(item);
     }
   });
-  Object.keys(data_markers[0]).forEach((item) => {
-    if (!isNaN(data_markers[0][item])) {
+  Object.keys(data_markers.features[0].properties).forEach((item) => {
+    if (!isNaN(data_markers.features[0].properties[item])) {
       propsMarkers.push(item);
     }
   });
-
-  // Handle Functions
-  // const handleChange = (event) => {
-  //   setFile(event.target.files[0]);
-  //   setFileName(event.target.files[0].name);
-  // };
 
   useEffect(() => {
     async function fetchData() {
@@ -104,31 +87,6 @@ const Home = () => {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {/* <ListItem disablePadding style={{ display: "flex" }}>
-              <FormControl variant="standard" sx={{ m: 1, minWidth: 120, margin: 'auto' }}>
-                <input
-                  accept="*"
-                  style={{ display: 'none' }}
-                  id="contained-button-file"
-                  type="file"
-                  onChange={handleChange}
-                />
-                <TextField
-                  id="file-name"
-                  label="File Name"
-                  value={fileName ? fileName : ""}
-                  margin="normal"
-                  variant="standard"
-                  disabled
-                />
-                <label htmlFor="contained-button-file" style={{ margin: 'auto' }}>
-                  <Button variant="contained" component="span" endIcon={<UploadFile />} style={{ margin: 10 }}>
-                    Choose File
-                  </Button>
-                </label>
-              </FormControl>
-            </ListItem> */}
-            {/* <Divider style={{ marginTop: 20 }} /> */}
             <ListItem disablePadding style={{ display: "flex" }}>
               <MapOutlinedIcon style={{ marginLeft: 20, marginTop: 18, marginRight: 5 }} fontSize="medium" />
               <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
@@ -142,7 +100,7 @@ const Home = () => {
                 >
                   {choroplethVar && <MenuItem value={undefined}>Nenhum</MenuItem>}
                   {propsPolygon.map((prop) => (
-                    <MenuItem value={prop}>{prop}</MenuItem>
+                    <MenuItem key={prop} value={prop}>{prop}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -159,7 +117,7 @@ const Home = () => {
                   label="Marcadores"
                 >
                   {propsMarkers.map((prop) => (
-                    <MenuItem value={prop}>{prop}</MenuItem>
+                    <MenuItem key={prop} value={prop}>{prop}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
