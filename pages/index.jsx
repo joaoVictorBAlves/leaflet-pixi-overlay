@@ -21,7 +21,7 @@ import data from "../data/mapa-social-caucaia.json"
 import data_markers from "../data/teste-marcadores.json";
 import points from "../data/teste-rota.json"
 import { useEffect, useState } from "react";
-const Map = dynamic(() => import("../MapComponent"), {
+const Map = dynamic(() => import("../MapComponent/index2"), {
   ssr: false
 });
 
@@ -130,12 +130,12 @@ const Home = () => {
         <Toolbar />
         <Map
           data={data}
-          coordenates={[lat, lon]}
+          coordinates={[lat, lon]}
           zoom={11}
-          choroplethVariable={choroplethVar}
-          dataMakers={data_markers}
-          makerVariable={makersVar}
-          route={route}
+          variable={choroplethVar}
+          // dataMakers={data_markers}
+          // makerVariable={makersVar}
+          // route={route}
         />
       </Box>
     </Box>

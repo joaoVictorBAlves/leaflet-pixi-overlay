@@ -5,7 +5,7 @@ import "leaflet-pixi-overlay";
 import * as d3 from "d3"
 import "pixi.js";
 
-const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20, dataMakers, choroplethVariable, makerVariable, route }) => {
+const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20, variable, type = "polygons", route }) => {
     const mapContainerRef = useRef(null);
     var map;
     // DEFINIÇÃO DAD ESCALAS
@@ -13,8 +13,8 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
     let quantileScale = null;
     let quantizeScale = null;
     useEffect(() => {
-        if (choroplethVariable) {
-            data.features.forEach((feauture) => set.push(feauture.properties[choroplethVariable]));
+        if (variable) {
+            data.features.forEach((feauture) => set.push(feauture.properties[variable]));
             quantileScale = d3.scaleQuantile()
                 .domain(set.sort((a, b) => a - b))
                 .range([0xe5f5e0, 0xa1d99b, 0x31a354, 0x006d2c]);
@@ -23,7 +23,7 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                 .range([0xe5f5e0, 0xa1d99b, 0x31a354, 0x006d2c]);
 
         }
-    }, [choroplethVariable]);
+    }, [variable]);
     // UPDATE STATES
     useEffect(() => {
         if (mapContainerRef.current) {
@@ -45,9 +45,9 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                 map.attributionControl.setPosition('bottomright');
                 map.zoomControl.setPosition('topleft');
                 // CRIAÇÃO DAS LEGENDAS PARA CHOROPLETH
-                if (choroplethVariable) {
+                if (variable) {
                     var legend = L.control({ position: 'bottomright' });
-                    var values = data.features.map(feauture => feauture.properties[choroplethVariable]);
+                    var values = data.features.map(feauture => feauture.properties[variable]);
                     var scaleFactor = (Math.max.apply(Math, values) - Math.min.apply(Math, values)) / 4.0
                     var scaleRange = []
                     for (let i = 0; i < 5; i++) scaleRange.push((i * scaleFactor).toFixed(2))
@@ -87,7 +87,7 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                     var firstDraw = true;
                     var prevZoom;
                     // INSTANCIANDO POLÍGONOS
-                    if (data) {
+                    if (type === "polygons") {
                         var polygonsByGeojson = [];
                         var polygonFeautures = [];
                         data.features.forEach((feauture) => {
@@ -106,16 +106,16 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                         });
                     }
                     // INSTANCIAÇÃO DO MARCADORES
-                    if (dataMakers) {
+                    if (type === "markers") {
                         var markers = []
                         if (makerVariable) {
                             // ESCALA DOS MARCADORES
-                            var values = dataMakers.features.map(feauture => feauture.properties[makerVariable])
+                            var values = data.features.map(feauture => feauture.properties[makerVariable])
                             var max = Math.max.apply(Math, values);
                             var min = Math.min.apply(Math, values);
                             var scaleValue = (max - min) / 3.0
                         }
-                        dataMakers.features.forEach((marker) => {
+                        data.features.forEach((marker) => {
                             var texture = markerTexture.marker
                             if (makerVariable) {
                                 var valor = marker.properties[makerVariable]
@@ -138,11 +138,11 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                     }
                     // ADICIONANDO GRÁFICOS NO PIXI CONTAINER
                     var pixiContainer = new PIXI.Container();
-                    if (data) {
+                    if (type === "polygons") {
                         polygonsByGeojson.forEach((geo) => { geo.interactive = true });
                         pixiContainer.addChild(...polygonsByGeojson);
                     }
-                    if (dataMakers) {
+                    if (type === "markers") {
                         markers.forEach((geo) => { geo.interactive = true });
                         pixiContainer.addChild(...markers);
                     }
@@ -172,8 +172,8 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                                 }
                             });
                             // DEFINIÇÕES DO MARCADORES 
-                            if (dataMakers) {
-                                dataMakers.features.forEach((marker, index) => {
+                            if (type === "markers") {
+                                data.features.forEach((marker, index) => {
                                     var markerCoord = project([marker.geometry.coordinates[1], marker.geometry.coordinates[0]]);
                                     markers[index].x = markerCoord.x;
                                     markers[index].y = markerCoord.y;
@@ -185,22 +185,22 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                         }
                         // ATUALIZAÇÕES DE GRÁFICOS
                         if (firstDraw || prevZoom !== zoom) {
-                            if (data) {
-                                if (choroplethVariable) {
+                            if (type === "polygons") {
+                                if (variable) {
                                     // CRIAÇÃO DA ESCALA DA PROPRIEDADE
-                                    var values = polygonFeautures.map(feauture => feauture.properties[choroplethVariable]);
+                                    var values = polygonFeautures.map(feauture => feauture.properties[variable]);
                                     var max = Math.max.apply(Math, values);
                                     var min = Math.min.apply(Math, values);
                                     var scaleValue = (max - min) / 4.0
                                 }
                                 polygonsByGeojson.forEach((polygon, i) => {
-                                    var color = "#000";
-                                    var alpha = 0.5
+                                    var color = 0xe5f5e0;
+                                    var valor = 0;
+                                    var alpha = 1;
                                     // DESENHO DO CHOROPLETH
-                                    if (choroplethVariable) {
-                                        var valor = polygonFeautures[i].properties[choroplethVariable]
+                                    if (variable) {
+                                        var valor = polygonFeautures[i].properties[variable]
                                         color = quantileScale(valor);
-                                        alpha = 1
                                     }
                                     // DESENHO DO POLÍGONO
                                     polygon.clear()
@@ -226,11 +226,11 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                                             latLon = polygonFeautures[i].geometry.coordinates[0][0];
                                         polygon.popup = L.popup()
                                             .setLatLng([latLon[1], latLon[0]])
-                                            .setContent(`Bairro ${polygonFeautures[i].properties[choroplethVariable]}`)
+                                            .setContent(`Bairro ${polygonFeautures[i].properties[variable]}`)
                                     });
                                 });
                             }
-                            if (dataMakers) {
+                            if (type === "markers") {
                                 markers.forEach((marker) => {
                                     marker.currentScale = marker.scale.x;
                                     marker.targetScale = 0.1 / scale;
@@ -247,7 +247,7 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                             var lambda = progress / duration;
                             if (lambda > 1) lambda = 1;
                             lambda = lambda * (0.4 + lambda * (2.2 + lambda * -1.6));
-                            if (dataMakers) {
+                            if (type === "markers") {
                                 markers.forEach((marker) => {
                                     marker.scale.set(marker.currentScale + lambda * (marker.targetScale - marker.currentScale));
                                 });
@@ -273,7 +273,7 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
         return () => {
             map.remove();
         }
-    }, [mapContainerRef, data, choroplethVariable, makerVariable]);
+    }, [mapContainerRef, data, variable]);
 
     return (
         <div ref={mapContainerRef} id="map-container" className={Style.Map}>
