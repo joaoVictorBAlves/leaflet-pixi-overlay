@@ -17,36 +17,30 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 // Data and Import utilities
 import dynamic from "next/dynamic";
-import data from "../data/fortaleza.json"
-import data_markers from "../data/MarkerMap.json";
+import data from "../data/MarkerMap.json";
 import points from "../data/teste-rota.json"
 import { useEffect, useState } from "react";
+import { ColorLens, Straighten } from "@mui/icons-material";
 const Map = dynamic(() => import("../MapComponent"), {
   ssr: false
 });
 
 const Home = () => {
-  // STATES
-  const [choroplethVar, setChoropletVar] = useState();
-  const [route, setRoute] = useState();
-  const [markersVar, setMarkersVar] = useState();
-  const [lon, setLon] = useState(data.features[0].geometry.coordinates[0][0][0]);
-  const [lat, setLat] = useState(data.features[0].geometry.coordinates[0][0][1]);
-  const drawerWidth = 240;
-  var fetch_data = null;
   // LISTAS DE PROPRIEDADES DOS GRÁFICOS
-  const propsPolygon = [];
-  const propsMarkers = [];
+  const propsVariables = [];
   Object.keys(data.features[0].properties).forEach((item) => {
     if (!isNaN(data.features[0].properties[item])) {
-      propsPolygon.push(item);
+      propsVariables.push(item);
     }
   });
-  Object.keys(data_markers[0].properties).forEach((item) => {
-    if (!isNaN(data_markers[0].properties[item])) {
-      propsMarkers.push(item);
-    }
-  });
+  // STATES
+  const [variable, setVariable] = useState();
+  const [lon, setLon] = useState(data.typeMap === "markers" ? data.features[0].geometry.coordinates[1] : data.features[0].geometry.coordinates[0][0][0]);
+  const [lat, setLat] = useState(data.typeMap === "markers" ? data.features[0].geometry.coordinates[0] : data.features[0].geometry.coordinates[0][0][1]);
+  const [scaleMethod, setScaleMethod] = useState();
+  const [scaleColor, setScaleColor] = useState()
+  const drawerWidth = 240;
+  var fetch_data = null;
 
   useEffect(() => {
     async function fetchData() {
@@ -88,35 +82,22 @@ const Home = () => {
         <Box sx={{ overflow: 'auto' }}>
           <List>
             <ListItem disablePadding style={{ display: "flex" }}>
-              <MapOutlinedIcon style={{ marginLeft: 20, marginTop: 18, marginRight: 5 }} fontSize="medium" />
+              {data.typeMap === "polygons" && <MapOutlinedIcon style={{ marginLeft: 20, marginTop: 18, marginRight: 5 }} fontSize="medium" />}
+              {data.typeMap === "markers" && <LocationOnOutlinedIcon style={{ marginLeft: 20, marginTop: 18, marginRight: 5 }} fontSize="medium" />}
               <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                <InputLabel id="demo-simple-select-standard-label">Choropleth</InputLabel>
+                <InputLabel id="demo-simple-select-standard-label">{data.typeMap === "polygons" ? "Poligonos" : "Marcadores"}</InputLabel>
                 <Select
                   labelId="demo-simple-select-standard-label"
                   id="demo-simple-select-standard"
-                  value={choroplethVar}
-                  onChange={(e) => { setChoropletVar(e.target.value) }}
-                  label="Choropleth"
-                >
-                  {choroplethVar && <MenuItem value={undefined}>Nenhum</MenuItem>}
-                  {propsPolygon.map((prop) => (
-                    <MenuItem key={prop} value={prop}>{prop}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </ListItem>
-            <ListItem disablePadding style={{ display: "flex" }}>
-              <LocationOnOutlinedIcon style={{ marginLeft: 20, marginTop: 18, marginRight: 5 }} fontSize="medium" />
-              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                <InputLabel id="demo-simple-select-standard-label">Marcadores</InputLabel>
-                <Select
-                  labelId="demo-simple-select-standard-label"
-                  id="demo-simple-select-standard"
-                  value={markersVar}
-                  onChange={(e) => { e.target.value === "" ? setMarkersVar(undefined) : setMarkersVar(e.target.value) }}
+                  value={variable}
+                  onChange={(e) => {
+                    setScaleColor("Sequencial");
+                    setScaleMethod("quantize");
+                    e.target.value === "" ? setVariable(undefined) : setVariable(e.target.value)
+                  }}
                   label="Marcadores"
                 >
-                  {propsMarkers.map((prop) => (
+                  {propsVariables.map((prop) => (
                     <MenuItem key={prop} value={prop}>{prop}</MenuItem>
                   ))}
                 </Select>
@@ -124,21 +105,60 @@ const Home = () => {
             </ListItem>
           </List>
           <Divider />
+          {variable &&
+            <List>
+              <ListItem disablePadding style={{ display: "flex" }}>
+                <Straighten style={{ marginLeft: 20, marginTop: 18, marginRight: 5 }} fontSize="medium" />
+                <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                  <InputLabel id="demo-simple-select-standard-label">Método</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-standard-label"
+                    id="demo-simple-select-standard"
+                    value={scaleMethod}
+                    onChange={(e) => { setScaleMethod(e.target.value) }}
+                    label="Choropleth"
+                  >
+                    <MenuItem key={1} value={"quantile"}>Quantile</MenuItem>
+                    <MenuItem key={2} value={"quantize"}>Quantize</MenuItem>
+                  </Select>
+                </FormControl>
+              </ListItem>
+              {data.typeMap === "polygons" && <ListItem disablePadding style={{ display: "flex" }}>
+                <ColorLens style={{ marginLeft: 20, marginTop: 18, marginRight: 5 }} fontSize="medium" />
+                <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                  <InputLabel id="demo-simple-select-standard-label">Paleta</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-standard-label"
+                    id="demo-simple-select-standard"
+                    value={scaleColor}
+                    onChange={(e) => { setScaleColor(e.target.value) }}
+                    label="Paleta"
+                  >
+                    <MenuItem key={1} value={"Sequencial"}>Sequencial</MenuItem>
+                    <MenuItem key={2} value={"Divergente"} > Divergente</MenuItem>
+                  </Select>
+                </FormControl>
+              </ListItem>}
+            </List>
+          }
         </Box>
-      </Drawer>
+      </Drawer >
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Toolbar />
         <Map
           data={data}
           coordinates={[lat, lon]}
           zoom={11}
-          variable={choroplethVar}
-          // dataMakers={data_markers}
-          // makerVariable={markersVar}
-          // route={route}
+          type={data.typeMap}
+          variable={variable}
+          scaleMethod={scaleMethod}
+          scaleColor={scaleColor}
+        // dataMakers={data}
+        // makerVariable={variable}
+        // route={route}
         />
       </Box>
-    </Box>
+    </Box >
   );
 }
 

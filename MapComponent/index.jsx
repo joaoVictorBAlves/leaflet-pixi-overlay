@@ -5,25 +5,31 @@ import "leaflet-pixi-overlay";
 import * as d3 from "d3"
 import "pixi.js";
 
-const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20, variable, type = "polygons", scaleColor = [0xe5f5e0, 0xa1d99b, 0x31a354, 0x006d2c] }) => {
+const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 0, maxZoom = 20, variable, type = "polygons", scaleMethod, scaleColor = [0xe5f5e0, 0xa1d99b, 0x31a354, 0x006d2c] }) => {
     const mapContainerRef = useRef(null);
     var map;
     // DEFINIÇÃO DAD ESCALAS
     const set = [];
-    let quantileScale = null;
-    let quantizeScale = null;
+    let mapScale = null;
     useEffect(() => {
-        if (variable) {
-            data.features.forEach((feauture) => set.push(feauture.properties[variable]));
-            quantileScale = d3.scaleQuantile()
+        data.features.forEach((feauture) => set.push(feauture.properties[variable]));
+        if (type === "polygons") {
+            if (scaleColor === "Sequencial")
+                scaleColor = [0xe5f5e0, 0xa1d99b, 0x31a354, 0x006d2c];
+            else
+                scaleColor = [0x00939C, 0xA2D4D7, 0xEFBEAE, 0xC22E00];
+        } else {
+            scaleColor = ['red', 'orange', 'yellow', "green"]
+        }
+        if (scaleMethod === "quantile")
+            mapScale = d3.scaleQuantile()
                 .domain(set.sort((a, b) => a - b))
                 .range(scaleColor);
-            quantizeScale = d3.scaleQuantize()
+        else
+            mapScale = d3.scaleQuantize()
                 .domain([d3.min(set.sort((a, b) => a - b)), d3.max(set.sort((a, b) => a - b))])
                 .range(scaleColor);
-
-        }
-    }, [variable]);
+    }, [variable, scaleMethod, scaleColor]);
     // UPDATE STATES
     useEffect(() => {
         if (mapContainerRef.current) {
@@ -87,22 +93,14 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                             var scaleValue = (max - min) / 3.0
                         }
                         data.features.forEach((marker) => {
-                            var texture = markerTexture.marker
+                            let texture = markerTexture.marker;
                             if (variable) {
                                 var valor = marker.properties[variable]
-                                if (valor < scaleValue) {
-                                    texture = markerTexture.red
-                                } else if (valor > scaleValue && valor < scaleValue * 2) {
-                                    texture = markerTexture.orange
-                                } else if (valor > scaleValue * 2 && valor < scaleValue * 3) {
-                                    texture = markerTexture.yellow
-                                } else if (valor > scaleValue * 3) {
-                                    texture = markerTexture.green
-                                }
+                                texture = markerTexture[mapScale(valor)]
                             }
                             var pixiMarker = new PIXI.Sprite(texture);
                             pixiMarker.popup = L.popup()
-                                .setLatLng([marker.geometry.coordinates[1], marker.geometry.coordinates[0]])
+                                .setLatLng([marker.geometry.coordinates[0], marker.geometry.coordinates[1]])
                                 .setContent(marker.properties[variable]);
                             markers.push(pixiMarker)
                         });
@@ -146,7 +144,7 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                             // DEFINIÇÕES DO MARCADORES 
                             if (type === "markers") {
                                 data.features.forEach((marker, index) => {
-                                    var markerCoord = project([marker.geometry.coordinates[1], marker.geometry.coordinates[0]]);
+                                    var markerCoord = project([marker.geometry.coordinates[0], marker.geometry.coordinates[1]]);
                                     markers[index].x = markerCoord.x;
                                     markers[index].y = markerCoord.y;
                                     markers[index].anchor.set(0.5, 1);
@@ -161,11 +159,11 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                                 polygonsByGeojson.forEach((polygon, i) => {
                                     var color = scaleColor[0];
                                     var valor = 0;
-                                    var alpha = 1;
+                                    var alpha = 0.8;
                                     // CORES PARA O CHOROPLETH COM BASE EM ESCALA
                                     if (variable) {
                                         var valor = polygonFeautures[i].properties[variable]
-                                        color = quantileScale(valor);
+                                        color = mapScale(valor);
                                     }
                                     // DESENHO DO POLÍGONO
                                     polygon.clear()
@@ -231,7 +229,7 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
         return () => {
             map.remove();
         }
-    }, [mapContainerRef, data, variable]);
+    }, [mapContainerRef, data, variable, scaleMethod, scaleColor]);
 
     return (
         <div ref={mapContainerRef} id="map-container" className={Style.Map}>
