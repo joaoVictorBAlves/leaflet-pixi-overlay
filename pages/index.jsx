@@ -17,11 +17,11 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 // Data and Import utilities
 import dynamic from "next/dynamic";
-import data from "../data/mapa-social-caucaia.json"
-import data_markers from "../data/teste-marcadores.json";
+import data from "../data/fortaleza.json"
+import data_markers from "../data/MarkerMap.json";
 import points from "../data/teste-rota.json"
 import { useEffect, useState } from "react";
-const Map = dynamic(() => import("../MapComponent/index2"), {
+const Map = dynamic(() => import("../MapComponent"), {
   ssr: false
 });
 
@@ -29,7 +29,7 @@ const Home = () => {
   // STATES
   const [choroplethVar, setChoropletVar] = useState();
   const [route, setRoute] = useState();
-  const [makersVar, setMakersVar] = useState();
+  const [markersVar, setMarkersVar] = useState();
   const [lon, setLon] = useState(data.features[0].geometry.coordinates[0][0][0]);
   const [lat, setLat] = useState(data.features[0].geometry.coordinates[0][0][1]);
   const drawerWidth = 240;
@@ -42,8 +42,8 @@ const Home = () => {
       propsPolygon.push(item);
     }
   });
-  Object.keys(data_markers.features[0].properties).forEach((item) => {
-    if (!isNaN(data_markers.features[0].properties[item])) {
+  Object.keys(data_markers[0].properties).forEach((item) => {
+    if (!isNaN(data_markers[0].properties[item])) {
       propsMarkers.push(item);
     }
   });
@@ -112,8 +112,8 @@ const Home = () => {
                 <Select
                   labelId="demo-simple-select-standard-label"
                   id="demo-simple-select-standard"
-                  value={makersVar}
-                  onChange={(e) => { e.target.value === "" ? setMakersVar(undefined) : setMakersVar(e.target.value) }}
+                  value={markersVar}
+                  onChange={(e) => { e.target.value === "" ? setMarkersVar(undefined) : setMarkersVar(e.target.value) }}
                   label="Marcadores"
                 >
                   {propsMarkers.map((prop) => (
@@ -134,7 +134,7 @@ const Home = () => {
           zoom={11}
           variable={choroplethVar}
           // dataMakers={data_markers}
-          // makerVariable={makersVar}
+          // makerVariable={markersVar}
           // route={route}
         />
       </Box>
