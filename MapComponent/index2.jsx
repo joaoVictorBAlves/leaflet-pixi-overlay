@@ -7,6 +7,7 @@ import "pixi.js";
 
 const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20, variable, type = "polygons", route }) => {
     const mapContainerRef = useRef(null);
+    const scaleColor = [0xe5f5e0, 0xa1d99b, 0x31a354, 0x006d2c];
     var map;
     // DEFINIÇÃO DAD ESCALAS
     const set = [];
@@ -17,10 +18,10 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
             data.features.forEach((feauture) => set.push(feauture.properties[variable]));
             quantileScale = d3.scaleQuantile()
                 .domain(set.sort((a, b) => a - b))
-                .range([0xe5f5e0, 0xa1d99b, 0x31a354, 0x006d2c]);
+                .range(scaleColor);
             quantizeScale = d3.scaleQuantize()
                 .domain([d3.min(set.sort((a, b) => a - b)), d3.max(set.sort((a, b) => a - b))])
-                .range([0xe5f5e0, 0xa1d99b, 0x31a354, 0x006d2c]);
+                .range(scaleColor);
 
         }
     }, [variable]);
@@ -34,7 +35,7 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
             loader.add('yellow', 'assets/yellow.png');
             loader.add('green', 'assets/green.png');
             loader.load(function (loader, resources) {
-                // CRIACAO DO MAPA
+                // CIRAR MAPA
                 map = L.map(mapContainerRef.current).setView(coordinates, zoom);
                 L.tileLayer('//stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
                     subdomains: 'abcd',
@@ -45,35 +46,35 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                 map.attributionControl.setPosition('bottomright');
                 map.zoomControl.setPosition('topleft');
                 // CRIAÇÃO DAS LEGENDAS PARA CHOROPLETH
-                if (variable) {
-                    var legend = L.control({ position: 'bottomright' });
-                    var values = data.features.map(feauture => feauture.properties[variable]);
-                    var scaleFactor = (Math.max.apply(Math, values) - Math.min.apply(Math, values)) / 4.0
-                    var scaleRange = []
-                    for (let i = 0; i < 5; i++) scaleRange.push((i * scaleFactor).toFixed(2))
-                    // FUNÇÃO QUE CRIA ESCALA DE CORES PARA LEGENDAS
-                    function getColor(d) {
-                        return d > scaleFactor * 4 ? '#00288f' :
-                            d > scaleFactor * 3 ? '#0859ce' :
-                                d > scaleFactor * 2 ? '#448fff' :
-                                    d > scaleFactor * 1 ? '#9aceff' :
-                                        '#b8efff';
-                    }
+                // if (variable) {
+                //     var legend = L.control({ position: 'bottomright' });
+                //     var values = data.features.map(feauture => feauture.properties[variable]);
+                //     var scaleFactor = (Math.max.apply(Math, values) - Math.min.apply(Math, values)) / 4.0
+                //     var scaleRange = []
+                //     for (let i = 0; i < 5; i++) scaleRange.push((i * scaleFactor).toFixed(2))
+                //     // FUNÇÃO QUE CRIA ESCALA DE CORES PARA LEGENDAS
+                //     function getColor(d) {
+                //         return d > scaleFactor * 4 ? '#00288f' :
+                //             d > scaleFactor * 3 ? '#0859ce' :
+                //                 d > scaleFactor * 2 ? '#448fff' :
+                //                     d > scaleFactor * 1 ? '#9aceff' :
+                //                         '#b8efff';
+                //     }
 
-                    legend.onAdd = function (map) {
-                        var div = L.DomUtil.create('div', `${Style.info} ${Style.legend}`),
-                            grades = scaleRange
-                        div.innerHTML += "<h4>Mapa Choropleth</h4><p>Renda salarial média</p><hr/>"
-                        // INTERVALO DE CADA COR
-                        for (var i = 0; i < grades.length; i++) {
-                            div.innerHTML +=
-                                '<i style="background:' + getColor(grades[i] + 1) + '; opacity:1;"></i> ' +
-                                grades[i] + (grades[i + 1] ? ' &ndash; ' + grades[i + 1] + '<br>' : '+');
-                        }
-                        return div;
-                    };
-                    legend.addTo(map);
-                }
+                //     legend.onAdd = function (map) {
+                //         var div = L.DomUtil.create('div', `${Style.info} ${Style.legend}`),
+                //             grades = scaleRange
+                //         div.innerHTML += "<h4>Mapa Choropleth</h4><p>Renda salarial média</p><hr/>"
+                //         // INTERVALO DE CADA COR
+                //         for (var i = 0; i < grades.length; i++) {
+                //             div.innerHTML +=
+                //                 '<i style="background:' + getColor(grades[i] + 1) + '; opacity:1;"></i> ' +
+                //                 grades[i] + (grades[i + 1] ? ' &ndash; ' + grades[i + 1] + '<br>' : '+');
+                //         }
+                //         return div;
+                //     };
+                //     legend.addTo(map);
+                // }
                 // GRAPHICS OVERLAY
                 var markerTexture = {
                     marker: resources.marker.texture,
@@ -108,17 +109,17 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                     // INSTANCIAÇÃO DO MARCADORES
                     if (type === "markers") {
                         var markers = []
-                        if (makerVariable) {
+                        if (variable) {
                             // ESCALA DOS MARCADORES
-                            var values = data.features.map(feauture => feauture.properties[makerVariable])
+                            var values = data.features.map(feauture => feauture.properties[variable])
                             var max = Math.max.apply(Math, values);
                             var min = Math.min.apply(Math, values);
                             var scaleValue = (max - min) / 3.0
                         }
                         data.features.forEach((marker) => {
                             var texture = markerTexture.marker
-                            if (makerVariable) {
-                                var valor = marker.properties[makerVariable]
+                            if (variable) {
+                                var valor = marker.properties[variable]
                                 if (valor < scaleValue) {
                                     texture = markerTexture.red
                                 } else if (valor > scaleValue && valor < scaleValue * 2) {
@@ -132,7 +133,7 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                             var pixiMarker = new PIXI.Sprite(texture);
                             pixiMarker.popup = L.popup()
                                 .setLatLng([marker.geometry.coordinates[1], marker.geometry.coordinates[0]])
-                                .setContent('<b>Hello world!</b><br>I am a marker.');
+                                .setContent(marker.properties[variable]);
                             markers.push(pixiMarker)
                         });
                     }
@@ -162,6 +163,7 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
 
                         if (firstDraw) {
                             utils.getMap().on('click', function (e) {
+                                // DEFINIÇÕES DE INTERATIVIDADE
                                 var interaction = utils.getRenderer().plugins.interaction;
                                 var pointerEvent = e.originalEvent;
                                 var pixiPoint = new PIXI.Point();
@@ -186,18 +188,11 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                         // ATUALIZAÇÕES DE GRÁFICOS
                         if (firstDraw || prevZoom !== zoom) {
                             if (type === "polygons") {
-                                if (variable) {
-                                    // CRIAÇÃO DA ESCALA DA PROPRIEDADE
-                                    var values = polygonFeautures.map(feauture => feauture.properties[variable]);
-                                    var max = Math.max.apply(Math, values);
-                                    var min = Math.min.apply(Math, values);
-                                    var scaleValue = (max - min) / 4.0
-                                }
                                 polygonsByGeojson.forEach((polygon, i) => {
-                                    var color = 0xe5f5e0;
+                                    var color = scaleColor[0];
                                     var valor = 0;
                                     var alpha = 1;
-                                    // DESENHO DO CHOROPLETH
+                                    // CORES PARA O CHOROPLETH COM BASE EM ESCALA
                                     if (variable) {
                                         var valor = polygonFeautures[i].properties[variable]
                                         color = quantileScale(valor);
@@ -220,14 +215,14 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                                         }
                                     })
                                     polygon.endFill();
-                                    polygon.on("pointerdown", () => {
-                                        var latLon = polygonFeautures[i].geometry.coordinates[0];
-                                        if (polygonFeautures[i].geometry.coordinates[0].length > 2)
-                                            latLon = polygonFeautures[i].geometry.coordinates[0][0];
-                                        polygon.popup = L.popup()
-                                            .setLatLng([latLon[1], latLon[0]])
-                                            .setContent(`Bairro ${polygonFeautures[i].properties[variable]}`)
-                                    });
+                                    // polygon.on("pointerdown", () => {
+                                    //     var latLon = polygonFeautures[i].geometry.coordinates[0];
+                                    //     if (polygonFeautures[i].geometry.coordinates[0].length > 2)
+                                    //         latLon = polygonFeautures[i].geometry.coordinates[0][0];
+                                    //     polygon.popup = L.popup()
+                                    //         .setLatLng([latLon[1], latLon[0]])
+                                    //         .setContent(`Bairro ${polygonFeautures[i].properties[variable]}`)
+                                    // });
                                 });
                             }
                             if (type === "markers") {
