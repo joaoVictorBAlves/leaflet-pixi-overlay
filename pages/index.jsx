@@ -17,7 +17,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 // Data and Import utilities
 import dynamic from "next/dynamic";
-import data from "../data/MarkerMap.json";
+import data from "../data/fortaleza.json";
 import points from "../data/teste-rota.json"
 import { useEffect, useState } from "react";
 import { ColorLens, Straighten } from "@mui/icons-material";
