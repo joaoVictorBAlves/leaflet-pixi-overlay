@@ -123,7 +123,7 @@ const Home = () => {
                   </Select>
                 </FormControl>
               </ListItem>
-              {data.typeMap === "polygons" && <ListItem disablePadding style={{ display: "flex" }}>
+              <ListItem disablePadding style={{ display: "flex" }}>
                 <ColorLens style={{ marginLeft: 20, marginTop: 18, marginRight: 5 }} fontSize="medium" />
                 <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
                   <InputLabel id="demo-simple-select-standard-label">Paleta</InputLabel>
@@ -138,7 +138,7 @@ const Home = () => {
                     <MenuItem key={2} value={"Divergente"} > Divergente</MenuItem>
                   </Select>
                 </FormControl>
-              </ListItem>}
+              </ListItem>
             </List>
           }
         </Box>

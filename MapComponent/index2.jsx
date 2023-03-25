@@ -43,6 +43,18 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 1, maxZoom = 20,
                     minZoom: minzoom,
                     maxZoom: maxZoom
                 }).addTo(map);
+                // GRAY
+                // L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                //     attribution: 'Map data &copy; <a href="https://carto.com">CartoDB</a>',
+                //     subdomains: 'abcd',
+                //     maxZoom: 19
+                // }).addTo(map);
+                // DARK
+                // L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                //     attribution: 'Map data &copy; <a href="https://carto.com">CartoDB</a>',
+                //     subdomains: 'abcd',
+                //     maxZoom: 19
+                // }).addTo(map);
                 map.attributionControl.setPosition('bottomright');
                 map.zoomControl.setPosition('topleft');
                 // CRIAÇÃO DAS LEGENDAS PARA CHOROPLETH
