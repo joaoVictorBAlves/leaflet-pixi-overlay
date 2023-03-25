@@ -7,7 +7,7 @@ import "pixi.js";
 import { Visibility } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 
-const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 0, maxZoom = 20, variable, type = "polygons", scaleMethod, scaleColor = [0xe5f5e0, 0xa1d99b, 0x31a354, 0x006d2c] }) => {
+const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 0, maxZoom = 20, variable, type = "polygons", scaleMethod, scaleColor = [0x96C7FF, 0x3693FF, 0x564BF, 0x063973] }) => {
     let palete = []
     const mapContainerRef = useRef(null);
     let hidden = true;
@@ -23,7 +23,7 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 0, maxZoom = 20,
             if (scaleColor === "Sequencial") {
                 scaleColor = [0x96C7FF, 0x3693FF, 0x564BF, 0x063973];
                 palete = ['#96C7FF', '#3693FF', '#0564BF', '#063973'];
-            } else {
+            } else if (scaleColor === "Divergente") {
                 scaleColor = [0xF73946, 0xFF6E77, 0x3693FF, 0x1564BF];
                 palete = ['#F73946', '#FF6E77', '#3693FF', '#1564BF'];
             }
@@ -32,7 +32,7 @@ const Map = ({ data, coordinates = [0, 0], zoom = 10, minzoom = 0, maxZoom = 20,
             if (scaleColor === "Sequencial") {
                 scaleColor = ["baixo", "medioBaixo", "medioAlto", "alto"];
                 palete = ['#96c7ff', '#3693ff', '#0564bf', '#063973'];
-            } else {
+            } else if (scaleColor === "Divergente") {
                 scaleColor = ["vermelho", "vermelhoMedio", "azul-medio", "azul"];
                 palete = ['#f73946', '#ff6e77', '#3693ff', '#1564bf'];
             }
